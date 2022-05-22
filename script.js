@@ -14,7 +14,7 @@ var TIMESTEP = 3600 * 24 * 1; // 1 day
 class Star {
 
   constructor({
-    name, x, y, radius, color, massInfo, x_vel, y_vel, orbit_line_size
+    name, x, y, radius, color, massInfo, x_vel, y_vel
   }) {
 
     this.name = name;
@@ -27,7 +27,7 @@ class Star {
 
     this.mass = this.massInfo[0] * 10**this.massInfo[1];
 
-    this.orbit_line_size = orbit_line_size || 100;
+    this.orbit_line_size = this.radius * 8;
 
     this.orbit = [];
 
@@ -136,8 +136,7 @@ function main() {
     radius: 7,
     color: "#e5e5e5",
     massInfo: [3.30, 23],
-    y_vel: -47.4 * 1000,
-    orbit_line_size: 30
+    y_vel: -47.4 * 1000
   });
 
   new Star({
