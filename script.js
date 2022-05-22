@@ -14,7 +14,7 @@ var TIMESTEP = 3600 * 24 * 1; // 1 day
 class Star {
 
   constructor({
-    name, x, y, radius, color, mass, x_vel, y_vel, orbit_line_size
+    name, x, y, radius, color, massInfo, x_vel, y_vel, orbit_line_size
   }) {
 
     this.name = name;
@@ -22,7 +22,11 @@ class Star {
     this.y = y || 0;
     this.radius = radius;
     this.color = color;
-    this.mass = mass;
+
+    this.massInfo = massInfo;
+
+    this.mass = this.massInfo[0] * 10**this.massInfo[1];
+
     this.orbit_line_size = orbit_line_size || 100;
 
     this.orbit = [];
@@ -106,6 +110,13 @@ class Star {
 
   }
 
+  updateMass(newMassInfo) {
+
+    this.massInfo = newMassInfo;
+    this.mass = newMassInfo[0] * 10**newMassInfo[1];
+
+  }
+
 }
 
 const planets = [];
@@ -116,7 +127,7 @@ function main() {
     name: 'Sun',
     radius: 40,
     color: "#ff0",
-    mass: 1.989 * 10**30
+    massInfo: [1.989, 30]
   });
 
   new Star({
@@ -124,7 +135,7 @@ function main() {
     x: 0.387*AU,
     radius: 7,
     color: "#e5e5e5",
-    mass: 3.30 * 10**23,
+    massInfo: [3.30, 23],
     y_vel: -47.4 * 1000,
     orbit_line_size: 30
   });
@@ -134,7 +145,7 @@ function main() {
     x: 0.723*AU,
     radius: 14,
     color: "#a57c1b",
-    mass: 4.8685 * 10**24,
+    massInfo: [4.8685, 24],
     y_vel: -35.02 * 1000
   });
 
@@ -143,9 +154,11 @@ function main() {
     x: -1*AU,
     radius: 16,
     color: "#6b93d6",
-    mass: 5.9742 * 10**24,
+    massInfo: [5.9742, 24],
     y_vel: 29.783 * 1000
   });
+
+  updateMassInfo();
 
   controlFramerate();
 }
@@ -168,6 +181,42 @@ function controlFramerate() {
   requestAnimationFrame(loop);
 
   setTimeout(controlFramerate, 1000 / FPS);
+
+}
+
+function updatePlanetMass(planetName) {
+
+  let planet = planets.find(p => p.name == planetName);
+
+  if(!planet) return;
+
+  const input1 = document.querySelector(`#${planetName.trim().toLowerCase()}-1`).value;
+  const input2 = document.querySelector(`#${planetName.trim().toLowerCase()}-2`).value;
+
+  planet.updateMass([input1, input2]);
+
+}
+
+function updateMassInfo() {
+
+  const list = document.querySelector('ul');
+
+  for(let planet of planets) {
+
+    let node = document.createElement('li');
+
+    node.innerHTML = `
+      <h1>${planet.name}</h1>
+      <p>
+        Mass: 
+          <input onchange="updatePlanetMass('${planet.name}')" id="${planet.name.trim().toLowerCase()}-1" style="width: 50px" min="0" value="${planet.massInfo[0]}" max="10" type="number"> 
+          * 10^
+          <input id="${planet.name.trim().toLowerCase()}-2" onchange="updatePlanetMass('${planet.name}')" min="1" value="${planet.massInfo[1]}" max="50" type="number"> </p>
+    `;
+
+    list.appendChild(node)
+
+  }
 
 }
 
