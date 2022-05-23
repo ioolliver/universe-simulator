@@ -3,13 +3,14 @@ const canvas = document.querySelector('canvas');
 const FPS = 60;
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
+var mousePos = {x: 0, y: 0};
 
 const context = canvas.getContext("2d", null);
 
 const AU = 149.6e6 * 1000; // 1 AU =~ 150 BILLIONS KM; * 1000 = CONVERTING KM TO METERS
 const G = 6.67428e-11;
-var SCALE = 150 / AU; // 1 AU = 100 pixels
-var TIMESTEP = 3600 * 24 * 1; // 1 day
+var SCALE = 50 / AU; // 1 AU = 100 pixels
+var TIMESTEP = 3600 * 12 * 1; // 12 hours
 
 class Star {
 
@@ -44,15 +45,15 @@ class Star {
     context.beginPath();
     for(let point of this.orbit) {
 
-      context.lineTo(point[0] * SCALE + WIDTH/2 + xVariant, point[1] * SCALE + HEIGHT/2 + yVariant);
+      context.lineTo(point[0] * SCALE*5 + WIDTH/2 + xVariant, point[1] * SCALE*5 + HEIGHT/2 + yVariant);
 
     }
     context.strokeStyle = "#fff";
     context.stroke();
     context.closePath();
 
-    let x = this.x * SCALE + WIDTH/2 + xVariant;
-    let y = this.y * SCALE + HEIGHT/2 + yVariant;
+    let x = this.x * SCALE*5 + WIDTH/2 + xVariant;
+    let y = this.y * SCALE*5 + HEIGHT/2 + yVariant;
 
     context.beginPath();
     context.arc(x, y, this.radius, 0, 2 * Math.PI);
@@ -133,7 +134,7 @@ function main() {
 
   new Star({
     name: 'Sun',
-    radius: 20000,
+    radius: 696340/8,
     color: "#ff0",
     massInfo: [1.989, 30]
   });
@@ -149,7 +150,7 @@ function main() {
 
   new Star({
     name: 'Venus',
-    x: 0.723*AU,
+    x: -0.723*AU,
     radius: 6051,
     color: "#a57c1b",
     massInfo: [4.8685, 24],
@@ -158,7 +159,7 @@ function main() {
 
   new Star({
     name: 'Earth',
-    x: -1*AU,
+    x: 1*AU,
     radius: 6371,
     color: "#6b93d6",
     massInfo: [5.9742, 24],
@@ -176,8 +177,8 @@ function main() {
 
   new Star({
     name: 'Jupiter',
-    x: -5.2*AU,
-    radius: 69911/3,
+    x: 5.2*AU,
+    radius: 69911,
     color: "#6b93d6",
     massInfo: [1.898, 27],
     y_vel: 13.06 * 1000
@@ -186,7 +187,7 @@ function main() {
   new Star({
     name: 'Saturn',
     x: -9.5*AU,
-    radius: 58232/3,
+    radius: 58232,
     color: "#ab604a",
     massInfo: [5.683, 26],
     y_vel: 9.68 * 1000
@@ -194,8 +195,8 @@ function main() {
 
   new Star({
     name: 'Uranus',
-    x: -19.8*AU,
-    radius: 25362/3,
+    x: 19.8*AU,
+    radius: 25362,
     color: "#e1eeee",
     massInfo: [8.681, 25],
     y_vel: 6.80 * 1000
@@ -204,7 +205,7 @@ function main() {
   new Star({
     name: 'Neptune',
     x: -30*AU,
-    radius: 24622/3,
+    radius: 24622,
     color: "#5b5ddf",
     massInfo: [10.024, 26],
     y_vel: 5.43 * 1000
@@ -225,6 +226,10 @@ function loop() {
     planet.draw();
 
   }
+
+  context.font = "14px Arial";
+  context.fillStyle = "#fff";
+  context.fillText(`X: ${mousePos.x - xVariant}, Y: ${mousePos.y - yVariant}`, WIDTH - 100, 15);
 
 }
 
@@ -258,7 +263,7 @@ function updateMassInfo() {
     let node = document.createElement('li');
 
     node.innerHTML = `
-      <h1>${planet.name}</h1>
+      <h1>${planet.name} <button onclick="goto('${planet.name}')">Goto</button></h1>
       <p>
         Mass: 
           <input onchange="updatePlanetMass('${planet.name}')" id="${planet.name.trim().toLowerCase()}-1" style="width: 50px" min="0" value="${planet.massInfo[0]}" max="10" type="number"> 
@@ -280,7 +285,7 @@ document.querySelector('#dps').addEventListener('change', (e) => {
   
   const newValue = document.querySelector('#dps').value;
 
-  TIMESTEP = 3600 * 24 * newValue;
+  TIMESTEP = 3600 * 12 * newValue;
 
 });
 
@@ -308,7 +313,7 @@ canvas.addEventListener('mousedown', (e) => {
   mouseDown = true;
 });
 
-canvas.addEventListener('mouseup', (e) => { mouseDown = false; });
+window.addEventListener('mouseup', (e) => { mouseDown = false; });
 
 var lastPosition = {x: 0, y: 0};
 
@@ -317,7 +322,7 @@ var yVariant = 0;
 
 canvas.addEventListener('mousemove', (e) => {
 
-  let mousePos = getMousePos(e);
+  mousePos = getMousePos(e);
 
   if(mouseDown) {
 
@@ -363,3 +368,14 @@ canvas.addEventListener('wheel', (e) => {
   }
 
 });
+
+function goto(planetName) {
+
+  const planet = planets.find(p => p.name == planetName);
+
+  if(!planet) return;
+
+  xVariant = -((planet.x*SCALE*5));
+  yVariant = -((planet.y*SCALE*5));
+
+}
