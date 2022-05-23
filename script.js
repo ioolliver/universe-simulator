@@ -136,7 +136,8 @@ function main() {
     name: 'Sun',
     radius: 696340/8,
     color: "#ff0",
-    massInfo: [1.989, 30]
+    massInfo: [1.989, 30],
+    x_vel: 1 * 1000
   });
 
   new Star({
