@@ -7,4 +7,4 @@ Test project for my final website (TCM)
 - Refactoring code
 - Add collision
 
-> Try it in https://ionascimento.github.io/universe-simulator
+> Try it in https://ioolliver.github.io/universe-simulator
